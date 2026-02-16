@@ -1,0 +1,38 @@
+{
+  "name": "pipeline-project",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "prepare": "husky",
+    "test": "jest",
+    "lint": "eslint .",
+    "format": "prettier . --check"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "morgan": "~1.9.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/jest": "^30.0.0",
+    "eslint": "^10.0.0",
+    "globals": "^17.3.0",
+    "husky": "^9.1.7",
+    "jest": "^30.2.0",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.8.1",
+    "supertest": "^7.2.2"
+  },
+  "lint-staged": {
+    "**/*.{js,ts, mjs,cjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "**/*.{html,css, md,y?ml}": [
+      "prettier --write"
+    ]
+  }
+}
