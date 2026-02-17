@@ -64,7 +64,7 @@ jobs:
       - name: SonarCloud Scan (Quality Gate)
         uses: SonarSource/sonarcloud-github-action@v3
         env:
-          # ⚠️ Remplace "PIPELINE" par le nom exact de ton secret si besoin
+          # ⚠️ Mets ici le nom exact du secret SonarCloud (tu utilises "PIPELINE")
           SONAR_TOKEN: ${{ secrets.PIPELINE }}
 
   docker_build:
@@ -102,6 +102,15 @@ jobs:
           load: true
           no-cache: true
           tags: ${{ steps.meta.outputs.tags }}
+
+      # ✅ Debug temporaire (très utile tant que Trivy bloque)
+      - name: Debug dependency versions inside image
+        run: |
+          IMAGE_REF="$(echo '${{ steps.meta.outputs.tags }}' | tail -n 1)"
+          echo "Image scanned: $IMAGE_REF"
+          docker run --rm "$IMAGE_REF" node -e "try{console.log('cross-spawn', require('cross-spawn/package.json').version)}catch(e){console.log('cross-spawn not found')}"
+          docker run --rm "$IMAGE_REF" node -e "try{console.log('glob', require('glob/package.json').version)}catch(e){console.log('glob not found')}"
+          docker run --rm "$IMAGE_REF" node -e "try{console.log('tar', require('tar/package.json').version)}catch(e){console.log('tar not found')}"
 
       - name: Save image to tar
         run: |
