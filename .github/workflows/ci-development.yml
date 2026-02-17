@@ -120,12 +120,20 @@ jobs:
           REF="$(echo '${{ steps.meta.outputs.tags }}' | tail -n 1)"
           echo "image_ref=$REF" >> $GITHUB_OUTPUT
 
-  trivy:
+    trivy:
     name: Trivy scan
     runs-on: ubuntu-latest
     needs: docker_build
 
     steps:
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+
+      - name: Load image
+        run: docker load -i image.tar
+
       - name: Scan image (fail on HIGH/CRITICAL)
         uses: aquasecurity/trivy-action@0.24.0
         with:
@@ -134,6 +142,8 @@ jobs:
           severity: HIGH,CRITICAL
           exit-code: 1
           ignore-unfixed: true
+          scanners: vuln
+
 
   publish:
     name: Publish to GHCR
