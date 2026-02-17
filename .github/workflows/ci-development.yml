@@ -93,12 +93,13 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build image (no push)
-        uses: docker/build-push-action@v6
-        with:
+      -- name: Build image (no push)
+         uses: docker/build-push-action@v6
+         with:
           context: .
           file: ./Dockerfile
           load: true
+          no-cache: true
           tags: ${{ steps.meta.outputs.tags }}
 
       # 🔥 export image pour le job suivant
