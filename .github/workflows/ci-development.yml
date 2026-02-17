@@ -144,6 +144,7 @@ jobs:
           ignore-unfixed: true
           scanners: vuln
 
+
   publish:
     name: Publish to GHCR
     runs-on: ubuntu-latest
