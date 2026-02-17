@@ -102,6 +102,17 @@ jobs:
           load: true
           tags: ${{ steps.meta.outputs.tags }}
 
+      - name: Save image to tar
+        run: |
+          IMAGE_REF="$(echo '${{ steps.meta.outputs.tags }}' | tail -n 1)"
+          docker save "$IMAGE_REF" -o image.tar
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: image.tar
+
       - name: Export image ref
         id: export
         run: |
