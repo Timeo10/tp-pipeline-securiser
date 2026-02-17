@@ -64,6 +64,7 @@ jobs:
       - name: SonarCloud Scan (Quality Gate)
         uses: SonarSource/sonarcloud-github-action@v3
         env:
+          # ⚠️ Remplace "PIPELINE" par le nom exact de ton secret si besoin
           SONAR_TOKEN: ${{ secrets.PIPELINE }}
 
   docker_build:
@@ -93,16 +94,15 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      -- name: Build image (no push)
-         uses: docker/build-push-action@v6
-         with:
+      - name: Build image (no push, no cache)
+        uses: docker/build-push-action@v6
+        with:
           context: .
           file: ./Dockerfile
           load: true
           no-cache: true
           tags: ${{ steps.meta.outputs.tags }}
 
-      # 🔥 export image pour le job suivant
       - name: Save image to tar
         run: |
           IMAGE_REF="$(echo '${{ steps.meta.outputs.tags }}' | tail -n 1)"
