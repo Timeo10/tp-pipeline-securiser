@@ -120,7 +120,7 @@ jobs:
           REF="$(echo '${{ steps.meta.outputs.tags }}' | tail -n 1)"
           echo "image_ref=$REF" >> $GITHUB_OUTPUT
 
-    trivy:
+  trivy:
     name: Trivy scan
     runs-on: ubuntu-latest
     needs: docker_build
@@ -143,7 +143,6 @@ jobs:
           exit-code: 1
           ignore-unfixed: true
           scanners: vuln
-
 
   publish:
     name: Publish to GHCR
