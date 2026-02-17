@@ -24,7 +24,7 @@
     # on copie seulement le nécessaire
     COPY --chown=nodeuser:nodegroup package*.json ./
     COPY --chown=nodeuser:nodegroup --from=deps /app/node_modules ./node_modules
-    COPY --chown=nodeuser:nodegroup --from=build /app/src ./src
+    COPY --chown=nodeuser:nodegroup --from=build /app ./
 
     
 
