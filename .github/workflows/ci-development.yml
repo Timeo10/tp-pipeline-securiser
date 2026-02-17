@@ -64,7 +64,7 @@ jobs:
       - name: SonarCloud Scan (Quality Gate)
         uses: SonarSource/sonarcloud-github-action@v3
         env:
-          # ⚠️ Mets ici le nom exact du secret SonarCloud (tu utilises "PIPELINE")
+          # ⚠️ Garde ton nom de secret tel quel si c'est bien celui de SonarCloud
           SONAR_TOKEN: ${{ secrets.PIPELINE }}
 
   docker_build:
@@ -103,7 +103,7 @@ jobs:
           no-cache: true
           tags: ${{ steps.meta.outputs.tags }}
 
-      # ✅ Debug temporaire (très utile tant que Trivy bloque)
+      # ✅ Debug temporaire : vérifie les versions DANS l'image buildée
       - name: Debug dependency versions inside image
         run: |
           IMAGE_REF="$(echo '${{ steps.meta.outputs.tags }}' | tail -n 1)"
@@ -129,6 +129,16 @@ jobs:
           REF="$(echo '${{ steps.meta.outputs.tags }}' | tail -n 1)"
           echo "image_ref=$REF" >> $GITHUB_OUTPUT
 
+      # ✅ On stocke le tag exact scanné pour éviter tout mismatch
+      - name: Save image ref to file
+        run: echo "${{ steps.export.outputs.image_ref }}" > image_ref.txt
+
+      - name: Upload image ref artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image-ref
+          path: image_ref.txt
+
   trivy:
     name: Trivy scan
     runs-on: ubuntu-latest
@@ -140,18 +150,37 @@ jobs:
         with:
           name: docker-image
 
+      - name: Download image ref artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image-ref
+
       - name: Load image
         run: docker load -i image.tar
+
+      - name: Read image ref
+        id: ref
+        run: echo "ref=$(cat image_ref.txt)" >> $GITHUB_OUTPUT
+
+      - name: Debug - list loaded images
+        run: docker images | head -n 20
 
       - name: Scan image (fail on HIGH/CRITICAL)
         uses: aquasecurity/trivy-action@0.24.0
         with:
-          image-ref: ${{ needs.docker_build.outputs.image_ref }}
+          image-ref: ${{ steps.ref.outputs.ref }}
           format: table
           severity: HIGH,CRITICAL
           exit-code: 1
           ignore-unfixed: true
           scanners: vuln
+          output: trivy.txt
+
+      - name: Upload Trivy report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: trivy.txt
 
   publish:
     name: Publish to GHCR
