@@ -5,9 +5,10 @@
   "scripts": {
     "start": "node ./bin/www",
     "prepare": "husky",
-    "test": "jest",
     "lint": "eslint .",
-    "format": "prettier . --check"
+    "format:check": "prettier --check .",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
